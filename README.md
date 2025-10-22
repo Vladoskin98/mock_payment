@@ -39,7 +39,7 @@ _.proto файл находится в папке mock_payment_
 ## Предлагаемая последовательность команд для запуска
 1) docker-compose up postgres -d **Запустить БД**
 2) docker-compose logs postgres **Проверить логи БД, запустилась ли** (я не заморочился и оставил подключение к БД примитивным, без ретраев)
-3) docker-compose up payment-server **Запустить сервер**
+3) docker-compose up payment-server -d **Запустить сервер**
 4) docker-compose logs payment-server **Проверить логи сервера**
-5) docker-compose up payment-client **Запустить клиента**
+5) docker-compose up payment-client -d **Запустить клиента**
 6) docker-compose logs payment-client **Проверить логи с ответами на тестовые данные**

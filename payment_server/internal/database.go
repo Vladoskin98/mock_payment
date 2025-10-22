@@ -45,7 +45,7 @@ func (db *DB) AddPayment(providerName string, amount float64, paymentDate string
 
 // Удаление записей, существующих дольше 10 минут
 func (db *DB) DeleteExpiredPayments() (int64, error) {
-	query := `DELETE FROM payments WHERE created_at < NOW() - INTERVAL '1 minutes'`
+	query := `DELETE FROM payments WHERE created_at < NOW() - INTERVAL '10 minutes'`
 	result, err := db.Exec(query)
 	if err != nil {
 		return 0, err

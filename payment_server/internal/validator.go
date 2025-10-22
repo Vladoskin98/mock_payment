@@ -10,12 +10,17 @@ import (
 	"unicode/utf8"
 )
 
+// Проверка записей, в случае успеха возвращается сумма платежа в рублях, округленная до копеек.
 func ValidateRequest(exchangeRate map[string]float64, providerName, amount, date string) (float64, error) {
 	// Проверка providerName
 	// Корректное значение -- то, которое содержит хотя бы одну букву(ограничиваюсь кириллицей и латиницей)/цифру
 	re := regexp.MustCompile(`[a-zA-Zа-яА-Я0-9]`)
 	if !re.MatchString(providerName) {
 		return 0, fmt.Errorf("имя провайдера указано некорректно")
+	}
+	// Длина - не более 100 букв
+	if utf8.RuneCountInString(providerName) > 100 {
+		return 0, fmt.Errorf("слишком длинное имя провайдера")
 	}
 
 	// Проверка и парсинг даты. К примеру, корректная дата для 2 января 2006 года - "02.01.2006"

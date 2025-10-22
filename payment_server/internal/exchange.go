@@ -11,16 +11,19 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-type ExchangeRateParser interface {
-	GetActualExchangeRate() (map[string]float64, error)
+type MockParser struct {
+	ExchangeRate map[string]float64
 }
 
-type MockParser struct{}
+func NewMockParser() *MockParser {
+	return &MockParser{ExchangeRate: make(map[string]float64)}
+}
 
-func (mp *MockParser) GetActualExchangeRate() (map[string]float64, error) {
+// Обработка .xml файла, получение map с курсом валют ('код валюты':курс)
+func (mp *MockParser) UpdateExchangeRate() error {
 	file, err := os.Open("./internal/CB_exchange_rate.xml")
 	if err != nil {
-		return nil, fmt.Errorf("ошибка открытия файла: %v", err)
+		return fmt.Errorf("ошибка открытия файла: %v", err)
 	}
 	defer file.Close()
 
@@ -46,18 +49,22 @@ func (mp *MockParser) GetActualExchangeRate() (map[string]float64, error) {
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {
-		return nil, fmt.Errorf("ошибка парсинга XML: %v", err)
+		return fmt.Errorf("ошибка парсинга XML: %v", err)
 	}
 
-	result := make(map[string]float64)
+	mp.ExchangeRate = make(map[string]float64)
 
 	for _, valute := range valCurs.Valutes {
 		value, err := strconv.ParseFloat(strings.ReplaceAll(valute.Value, ",", "."), 64)
 		if err != nil {
-			return nil, fmt.Errorf("ошибка парсинга значения для %s: %v", valute.CharCode, err)
+			return fmt.Errorf("ошибка парсинга значения для %s: %v", valute.CharCode, err)
 		}
-		result[valute.CharCode] = value
+		mp.ExchangeRate[valute.CharCode] = value
 	}
 
-	return result, nil
+	return nil
+}
+
+func (mp *MockParser) GetExchangeRate() map[string]float64 {
+	return mp.ExchangeRate
 }

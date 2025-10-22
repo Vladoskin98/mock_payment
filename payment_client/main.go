@@ -15,7 +15,9 @@ import (
 )
 
 func main() {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//Костыльное ожидание запуска БД и сервера
+	//time.Sleep(30 * time.Second)
+	conn, err := grpc.NewClient("payment-server:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("ошибка при установлении соединения: %v", err)
 	}
@@ -28,6 +30,7 @@ func main() {
 	currencyList := []string{"AKSA", "USD", "AUD", "BYR", "EUR"}
 	dateList := []string{"01.02.2006", "20.10.2025", time.Now().Format("02.01.2006")}
 
+	// Для параллельной отправки кучи запросов создаю на каждый кейс горутину
 	var wg sync.WaitGroup
 	for _, provider := range providerList {
 		for _, count := range countList {
